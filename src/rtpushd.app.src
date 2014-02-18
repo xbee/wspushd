@@ -1,0 +1,12 @@
+{application, rtpushd,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { rtpushd_app, []}},
+  {env, []}
+ ]}.

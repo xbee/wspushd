@@ -1,0 +1,7 @@
+
+message Device {
+  required uint32 cid = 1;
+  required uint32 devid = 2;  
+  required string msg = 3;
+}
+
