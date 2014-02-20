@@ -11,7 +11,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = descriptor.FileDescriptor(
   name='device.proto',
   package='',
-  serialized_pb='\n\x0c\x64\x65vice.proto\"1\n\x06\x44\x65vice\x12\x0b\n\x03\x63id\x18\x01 \x02(\r\x12\r\n\x05\x64\x65vid\x18\x02 \x02(\r\x12\x0b\n\x03msg\x18\x03 \x02(\t')
+  serialized_pb='\n\x0c\x64\x65vice.proto\">\n\x06\x44\x65vice\x12\x0b\n\x03\x63id\x18\x01 \x02(\r\x12\x0b\n\x03uid\x18\x02 \x02(\r\x12\r\n\x05\x63mdid\x18\x03 \x02(\r\x12\x0b\n\x03msg\x18\x04 \x02(\t')
 
 
 
@@ -31,15 +31,22 @@ _DEVICE = descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='devid', full_name='Device.devid', index=1,
+      name='uid', full_name='Device.uid', index=1,
       number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='msg', full_name='Device.msg', index=2,
-      number=3, type=9, cpp_type=9, label=2,
+      name='cmdid', full_name='Device.cmdid', index=2,
+      number=3, type=13, cpp_type=3, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='msg', full_name='Device.msg', index=3,
+      number=4, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -54,7 +61,7 @@ _DEVICE = descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=16,
-  serialized_end=65,
+  serialized_end=78,
 )
 
 DESCRIPTOR.message_types_by_name['Device'] = _DEVICE

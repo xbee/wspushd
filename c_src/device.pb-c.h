@@ -21,12 +21,13 @@ struct  _Device
 {
   ProtobufCMessage base;
   uint32_t cid;
-  uint32_t devid;
+  uint32_t uid;
+  uint32_t cmdid;
   char *msg;
 };
 #define DEVICE__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&device__descriptor) \
-    , 0, 0, NULL }
+    , 0, 0, 0, NULL }
 
 
 /* Device methods */

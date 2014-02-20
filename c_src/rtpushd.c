@@ -21,6 +21,27 @@
 #define BUFSIZE 1024
 #define MAXUSERS (17*65536) // C1024K
 
+#define CMD_GETUID      0
+#define CMD_GETUID_RESP 1
+#define CMD_LOGIN       2 
+#define CMD_LOGIN_RESP  3
+#define CMD_NEAR        4
+#define CMD_NEAR_RESP   5
+#define CMD_PING        6
+#define CMD_PING_RESP   7
+
+// getuid : uid 
+// login : 
+// cmdid(1) mac 
+// login-response : 
+// cmdid(2) uid
+// cmdid = near(4) blueid: string 
+// cmdid = ad(5) msg: "Welcome to rtmap f3"
+
+// logout : cmdid(3)
+
+unsigned g_UID = 0;
+
 // List of current websocket requests by uid:
 struct libwebsock_client_state * clients[MAXUSERS+1];
 // Memory to store uids passed to the cleanup callback:
@@ -74,39 +95,164 @@ ctx->onopen = some_callback_name;
 */
 
 
+int send_msg_b64(libwebsock_client_state *state, 
+             unsigned cid, 
+             unsigned uid, 
+             unsigned cmdid, 
+             char * msg) 
+{
+    printf("Enter send_msg \n");
+
+    Device dev = DEVICE__INIT;
+    dev.cid = cid;
+    dev.uid = uid;
+    dev.cmdid = cmdid;
+    dev.msg = msg;
+    // strncpy(dev.msg, msg, strlen(msg));
+
+    int len, xlen; 
+    void *buf, *b64buf;
+    len = device__get_packed_size(&dev);
+    buf = malloc(len);
+    device__pack(&dev, buf);
+
+    printf("device__pack ok\n");
+
+    xlen = len * 2 > MAXBUFLEN ? len*2 : MAXBUFLEN;
+    int outlen;
+    b64buf = malloc(xlen+1);
+    memset(b64buf, 0, xlen+1);
+    outlen = b64_encode_string(buf, len, b64buf, xlen);
+
+    printf("b64_encode_string ok\n");
+
+    libwebsock_send_text(state, b64buf);
+
+    free(buf);
+    free(b64buf);
+
+    printf("Exiting send_msg \n");
+    return 0;
+}
+
+int send_msg(libwebsock_client_state *state, 
+             unsigned cid, 
+             unsigned uid, 
+             unsigned cmdid, 
+             char * msg) 
+{
+    printf("Enter send_msg \n");
+
+    Device dev = DEVICE__INIT;
+    dev.cid = cid;
+    dev.uid = uid;
+    dev.cmdid = cmdid;
+    dev.msg = msg;
+    // strncpy(dev.msg, msg, strlen(msg));
+
+    int len=0; 
+    void *buf;
+    len = device__get_packed_size(&dev);
+    buf = malloc(len);
+    device__pack(&dev, buf);
+
+    printf("device__pack ok\n");
+
+    libwebsock_send_binary(state, buf, len);
+
+    free(buf);
+    // free(b64buf);
+
+    printf("Exiting send_msg \n");
+    return 0;
+}
+
 //basic onmessage callback, prints some information about this particular message
 //then echos back to the client.
 int
 onmessage(libwebsock_client_state *state, libwebsock_message *msg)
 {
+    printf("*********  fd: %d **************\n", state->sockfd);
+    printf("sizeof state: %d\n", sizeof(libwebsock_client_state) );
     fprintf(stderr, "Received message from client: %d\n", state->sockfd);
     fprintf(stderr, "Uri: %s\n", state->uri);
     fprintf(stderr, "Message opcode: %d\n", msg->opcode);
     fprintf(stderr, "Payload Length: %llu\n", msg->payload_len);
-    fprintf(stderr, "Payload: %s\n", msg->payload);
+    // fprintf(stderr, "Payload: %s\n", msg->payload);
 
-    char buf[MAXBUFLEN] = {0};
-    int xlen = b64_decode_string(trim(msg->payload), buf, sizeof buf);
+    // char buf[MAXBUFLEN] = {0};
+    // int xlen = b64_decode_string(trim(msg->payload), buf, sizeof buf);
 
-    printf("base64 decoded len: %d\n", xlen);
+    // printf("base64 decoded len: %d\n", xlen);
     // printMemBlock(buf, xlen);
 
     Device *dev = NULL;
-    dev = device__unpack(NULL, xlen, buf);
+    dev = device__unpack(NULL, msg->payload_len, msg->payload);
     if (NULL == dev) {
-        dev = device__unpack(NULL, xlen-1, buf);
-        if (NULL == dev) {
-            dev = device__unpack(NULL, xlen+1, buf);
-            if (NULL == dev) {
-                fprintf(stderr, "error unpacking incoming message\n");
-                exit(1);    
-            }
+        // dev = device__unpack(NULL, xlen-1, buf);
+        // if (NULL == dev) {
+        //     dev = device__unpack(NULL, xlen+1, buf);
+        //     if (NULL == dev) {
+        //         fprintf(stderr, "error unpacking incoming message\n");
+        //         exit(1);    
+        //     }
             
+        // }
+
+        fprintf(stderr, "error unpacking incoming message\n");
+        exit(1);        
+    }
+    printf("cid: %zu, uid: %zu, cmdid: %zu\n", dev->cid, dev->uid, dev->cmdid);
+    printf("message: %s\n", dev->msg);
+
+    if (dev->cmdid == CMD_GETUID) {
+
+        printf("This is a gutuid cmd\n");
+
+        if (strcmp(dev->msg, "1c:3e:84:3a:ac:a9") == 0) {
+            printf("Get test uid from mac\n");
+
+            int uid = 1234;
+            send_msg(state, 0, uid, CMD_GETUID_RESP, "getuid\0");
+            g_UID = uid;
+            libwebsock_close(state);
+            return 0;
+        }        
+        
+        printf("Can not get uid from mac\n");
+    } else if (dev->cmdid == CMD_LOGIN) {
+
+        printf("Received a login cmd\n");
+        send_msg(state, 0, g_UID, CMD_LOGIN_RESP, "login successful"); 
+
+    } else if (dev->cmdid == CMD_NEAR) {
+
+        if (clients[dev->uid]) {
+            printf("Received a near cmd\n");
+            printf("Near ibeacon id: %s\n", dev->msg);
+
+            libwebsock_client_state * ts = clients[dev->uid];
+            // if not equals , that means old connection have closed
+            assert(ts->sockfd == state->sockfd);
+            assert(ts == state);
+
+            send_msg(clients[dev->uid], 0, g_UID, CMD_NEAR_RESP, "Ad: lastest offers!"); 
+        }
+
+        
+    } else if (dev->cmdid == CMD_PING) {
+
+        if (clients[dev->uid]) {
+            printf("Received a ping cmd\n");
+            send_msg(clients[dev->uid], 0, g_UID, CMD_PING_RESP, "Keepalive!"); 
         }
         
     }
-    printf("cid: %zu, devid: %zu \n", dev->cid, dev->devid);
-    printf("message: %s\n", dev->msg);
+
+    clients[dev->uid] = state;
+
+    // Free the unpacked message
+    device__free_unpacked(dev, NULL);
     
     // get uid msg: com.wanda.app.wanhui/getuid/1c:3e:84:3a:ac:a9
     // msg: com.wanda.app.wanhui/1246/login
@@ -132,7 +278,7 @@ int
 onopen(libwebsock_client_state *state)
 {
     fprintf(stderr, "onopen: %d\n", state->sockfd);
-    libwebsock_send_text(state, "Welcome");
+    // libwebsock_send_text(state, "Welcome");
     // add this client to client_table
 
     return 0;

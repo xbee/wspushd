@@ -1,15 +1,25 @@
+
 import websocket
 import thread
 import time
 
-def encodeMsg(cid, uid, msg):
+MAXUSERS = 17 * 65536
+
+def encodeMsg(cid, uid, cmdid, msg):
     dev = device_pb2.Device()
     dev.cid = cid;
-    dev.devid = uid
+    dev.uid = uid
     dev.msg = msg
+    dev.cmdid = cmdid
     xs = dev.SerializeToString()
     es = base64.encodestring(xs)
     return es
+
+def decodeMsg(msg):
+    ds = base64.decodestring(msg)
+    dev = device_pb2.Device()
+    dev.ParseFromString(ds)
+    return dev
 
 def on_message(ws, message):
     print message
@@ -22,11 +32,11 @@ def on_close(ws):
 
 def on_open(ws):
     def run(*args):
-        for i in range(3):
-            time.sleep(1)
+        while True:
+          for i in range(MAXUSERS):            
             ws.send("Hello %d" % i)
-        time.sleep(1)
-        ws.close()
+          time.sleep(1)
+        # ws.close()
         print "thread terminating..."
     thread.start_new_thread(run, ())
 

@@ -34,18 +34,19 @@ int onopen(wsclient *c) {
 	unsigned len;
 	Device dev = DEVICE__INIT;
 	dev.cid = 1; // 1 means : com.wanda.app.wanhui
-	dev.devid = 1568;
+	dev.uid = 1568;
 	dev.msg = "Hello protobuf";
 	len = device__get_packed_size(&dev);
 	buf = malloc(len);
 	device__pack(&dev, buf);
 
-	int xlen = len * 2 > MAXBUFLEN ? len*2 : MAXBUFLEN;
-	int outlen;
-	b64buf = malloc(xlen+1);
-	memset(b64buf, 0, xlen+1);
-	outlen = b64_encode_string(buf, len, b64buf, xlen);
-	libwsclient_send(c, b64buf);
+	// int xlen = len * 2 > MAXBUFLEN ? len*2 : MAXBUFLEN;
+	// int outlen;
+	// b64buf = malloc(xlen+1);
+	// memset(b64buf, 0, xlen+1);
+	// outlen = b64_encode_string(buf, len, b64buf, xlen);
+	// libwsclient_send(c, b64buf);
+	libwsclient_send_binary(c, buf, len);
 	return 0;
 }
 

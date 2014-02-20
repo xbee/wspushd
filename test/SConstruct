@@ -43,21 +43,17 @@ libs = ['websock', 'protobuf-c']
 
 # common = Glob('../common/*.cpp')
 # srclist = ['LocNetPacketParser.cpp', 'rtmap_nif.cpp', 'niftools.cpp']
-srclist = ['rtpushd.c', 'device.pb-c.c', 'base64.c', 'printhex.c']
+srclist = ['test.c']
 
 # env = Environment(TARGET_ARCH='x86_64')
 
 # exec external command to compile device.proto to c 
 # device.pb-c.c depends on device.proto 
-env.Command('device.pb-c.c', 'device.proto', 'protoc-c --c_out=. device.proto')
-env.Command('device_pb2.py', 'device.proto', 'protoc --python_out=. device.proto')
 env.Append(CPPPATH=inc)
-env.Program(target='bin/rtpushd', 
-	source=srclist, 
-	LIBS=libs, LIBPATH=lib_path)
-env.Program(target='bin/test', 
-	source=['test.c', 'device.pb-c.c', 'base64.c', 'printhex.c'], 
-	LIBS=['wsclient', 'protobuf-c'], 
+
+env.Program(target='bin/wstestd', 
+	source=['wstestd.c'], 
+	LIBS=['websock'], 
 	LIBPATH=lib_path)
 # Decider('MD5-timestamp')
 env.Decider('MD5')

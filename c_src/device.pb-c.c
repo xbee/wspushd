@@ -50,7 +50,7 @@ void   device__free_unpacked
   PROTOBUF_C_ASSERT (message->base.descriptor == &device__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor device__field_descriptors[3] =
+static const ProtobufCFieldDescriptor device__field_descriptors[4] =
 {
   {
     "cid",
@@ -65,12 +65,24 @@ static const ProtobufCFieldDescriptor device__field_descriptors[3] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "devid",
+    "uid",
     2,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Device, devid),
+    PROTOBUF_C_OFFSETOF(Device, uid),
+    NULL,
+    NULL,
+    0,            /* packed */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "cmdid",
+    3,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_UINT32,
+    0,   /* quantifier_offset */
+    PROTOBUF_C_OFFSETOF(Device, cmdid),
     NULL,
     NULL,
     0,            /* packed */
@@ -78,7 +90,7 @@ static const ProtobufCFieldDescriptor device__field_descriptors[3] =
   },
   {
     "msg",
-    3,
+    4,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
@@ -91,13 +103,14 @@ static const ProtobufCFieldDescriptor device__field_descriptors[3] =
 };
 static const unsigned device__field_indices_by_name[] = {
   0,   /* field[0] = cid */
-  1,   /* field[1] = devid */
-  2,   /* field[2] = msg */
+  2,   /* field[2] = cmdid */
+  3,   /* field[3] = msg */
+  1,   /* field[1] = uid */
 };
 static const ProtobufCIntRange device__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 3 }
+  { 0, 4 }
 };
 const ProtobufCMessageDescriptor device__descriptor =
 {
@@ -107,7 +120,7 @@ const ProtobufCMessageDescriptor device__descriptor =
   "Device",
   "",
   sizeof(Device),
-  3,
+  4,
   device__field_descriptors,
   device__field_indices_by_name,
   1,  device__number_ranges,
