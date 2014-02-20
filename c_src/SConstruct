@@ -43,7 +43,7 @@ libs = ['websock', 'protobuf-c']
 
 # common = Glob('../common/*.cpp')
 # srclist = ['LocNetPacketParser.cpp', 'rtmap_nif.cpp', 'niftools.cpp']
-srclist = ['rtpushd.c', 'device.pb-c.c', 'base64.c', 'printhex.c']
+srclist = ['rtpushd.c', 'device.pb-c.c', 'printhex.c']
 
 # env = Environment(TARGET_ARCH='x86_64')
 
@@ -56,7 +56,7 @@ env.Program(target='bin/rtpushd',
 	source=srclist, 
 	LIBS=libs, LIBPATH=lib_path)
 env.Program(target='bin/test', 
-	source=['test.c', 'device.pb-c.c', 'base64.c', 'printhex.c'], 
+	source=['test.c', 'device.pb-c.c', 'printhex.c'], 
 	LIBS=['wsclient', 'protobuf-c'], 
 	LIBPATH=lib_path)
 # Decider('MD5-timestamp')

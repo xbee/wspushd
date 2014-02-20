@@ -6,10 +6,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-
-
 #include <stdlib.h>
 #include <websock/websock.h>
+#include <pthread.h>
 
 #include "erl_interface.h"
 #include "ei.h"
@@ -291,111 +290,78 @@ onclose(libwebsock_client_state *state)
     return 0;
 }
 
-// int my_listen(int port)
-// {
-//     int listen_fd;
-//     struct sockaddr_in addr;
-//     int on = 1;
+// runs in a thread - the erlang c-node stuff
+// expects msgs like {uid, msg} and sends a a 'msg' chunk to uid if connected
+void cnode_run()
+{
+    int fd;                                  /* fd to Erlang node */
+    int got;                                 /* Result of receive */
+    unsigned char buf[BUFSIZE];              /* Buffer for incoming message */
+    ErlMessage emsg;                         /* Incoming message */
 
-//     if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-//         return (-1);
+    ETERM *uid, *msg;
 
-//     setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+    erl_init(NULL, 0);
 
-//     memset((void *) &addr, 0, (size_t) sizeof(addr));
-//     addr.sin_family = AF_INET;
-//     addr.sin_port = htons(port);
-//     addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if (erl_connect_init(1, "secretcookie", 0) == -1)
+        erl_err_quit("erl_connect_init");
 
-//     if (bind(listen_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
-//         return (-1);
+    if ((fd = erl_connect("httpdmaster@localhost")) < 0)
+        erl_err_quit("erl_connect");
 
-//     listen(listen_fd, 5);
-//     return listen_fd;
-// }
+    fprintf(stderr, "Connected to httpdmaster@localhost\n\r");
 
-// int main(int argc, char **argv)
-// {
-//     struct in_addr addr;                     /* 32-bit IP number of host */
-//     int port;                                /* Listen port number */
-//     int listen;                              /* Listen socket */
-//     int fd;                                  /* fd to Erlang node */
-//     ErlConnect conn;                         /* Connection data */
+    struct evbuffer *evbuf;
 
-//     int loop = 1;                            /* Loop flag */
-//     int got;                                 /* Result of receive */
-//     unsigned char buf[BUFSIZE];              /* Buffer for incoming message */
-//     ErlMessage emsg;                         /* Incoming message */
-
-//     ETERM *fromp, *tuplep, *fnp, *argp, *resp;
-//     int res;
-
-//     port = atoi(argv[1]);
-
-//     erl_init(NULL, 0);
-
-//     addr.s_addr = inet_addr("134.138.177.89");
-//     if (erl_connect_xinit("idril", "cnode", "cnode@idril.du.uab.ericsson.se",
-//                           &addr, "secretcookie", 0) == -1)
-//         erl_err_quit("erl_connect_xinit");
-
-//     /* Make a listen socket */
-//     if ((listen = my_listen(port)) <= 0)
-//         erl_err_quit("my_listen");
-
-//     if (erl_publish(port) == -1)
-//         erl_err_quit("erl_publish");
-
-//     if ((fd = erl_accept(listen, &conn)) == ERL_ERROR)
-//         erl_err_quit("erl_accept");
-//     fprintf(stderr, "Connected to %s\n\r", conn.nodename);
-
-//     while (loop)
-//     {
-
-//         got = erl_receive_msg(fd, buf, BUFSIZE, &emsg);
-//         if (got == ERL_TICK)
-//         {
-//             /* ignore */
-//         }
-//         else if (got == ERL_ERROR)
-//         {
-//             loop = 0;
-//         }
-//         else
-//         {
-
-//             if (emsg.type == ERL_REG_SEND)
-//             {
-//                 fromp = erl_element(2, emsg.msg);
-//                 tuplep = erl_element(3, emsg.msg);
-//                 fnp = erl_element(1, tuplep);
-//                 argp = erl_element(2, tuplep);
-
-//                 if (strncmp(ERL_ATOM_PTR(fnp), "foo", 3) == 0)
-//                 {
-//                     res = foo(ERL_INT_VALUE(argp));
-//                 }
-//                 else if (strncmp(ERL_ATOM_PTR(fnp), "bar", 3) == 0)
-//                 {
-//                     res = bar(ERL_INT_VALUE(argp));
-//                 }
-
-//                 resp = erl_format("{cnode, ~i}", res);
-//                 erl_send(fd, fromp, resp);
-
-//                 erl_free_term(emsg.from); erl_free_term(emsg.msg);
-//                 erl_free_term(fromp); erl_free_term(tuplep);
-//                 erl_free_term(fnp); erl_free_term(argp);
-//                 erl_free_term(resp);
-//             }
-//         }
-//     }
-// }
+    while (1) {
+        got = erl_receive_msg(fd, buf, BUFSIZE, &emsg);
+        if (got == ERL_TICK) {
+            continue;
+        } else if (got == ERL_ERROR) {
+            fprintf(stderr, "ERL_ERROR from erl_receive_msg.\n");
+            break;
+        } else {
+            if (emsg.type == ERL_REG_SEND) {
+                // get uid and body data from eg: {123, <<"Hello">>}
+                uid = erl_element(1, emsg.msg);
+                msg = erl_element(2, emsg.msg);
+                int userid = ERL_INT_VALUE(uid);
+                char *body = (char *) ERL_BIN_PTR(msg);
+                int body_len = ERL_BIN_SIZE(msg);
+                // Is this userid connected?
+                if(clients[userid]){
+                    fprintf(stderr, "Sending %d bytes to uid %d\n", body_len, userid);                
+                    evbuf = evbuffer_new();
+                    evbuffer_add(evbuf, (const void*)body, (size_t) body_len);
+                    evhttp_send_reply_chunk(clients[userid], evbuf);
+                    evbuffer_free(evbuf);
+                }else{
+                    fprintf(stderr, "Discarding %d bytes to uid %d - user not connected\n", 
+                            body_len, userid);                
+                    // noop
+                }
+                erl_free_term(emsg.msg);
+                erl_free_term(uid); 
+                erl_free_term(msg);
+            }
+        }
+    }
+    // if we got here, erlang connection died.
+    // this thread is supposed to run forever
+    // TODO - gracefully handle failure / reconnect / etc
+    pthread_exit(0);
+}
 
 int
 main(int argc, char *argv[])
 {
+
+    // Launch the thread that runs the cnode:
+    pthread_attr_t tattr;
+    pthread_t helper;
+    int status;
+    pthread_create(&helper, NULL, cnode_run, NULL);
+
     char *port = DEF_PORT;
     libwebsock_context *ctx = NULL;
 
