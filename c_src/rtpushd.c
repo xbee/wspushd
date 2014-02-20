@@ -93,47 +93,6 @@ ctx->onopen = some_callback_name;
 
 */
 
-
-int send_msg_b64(libwebsock_client_state *state, 
-             unsigned cid, 
-             unsigned uid, 
-             unsigned cmdid, 
-             char * msg) 
-{
-    printf("Enter send_msg \n");
-
-    Device dev = DEVICE__INIT;
-    dev.cid = cid;
-    dev.uid = uid;
-    dev.cmdid = cmdid;
-    dev.msg = msg;
-    // strncpy(dev.msg, msg, strlen(msg));
-
-    int len, xlen; 
-    void *buf, *b64buf;
-    len = device__get_packed_size(&dev);
-    buf = malloc(len);
-    device__pack(&dev, buf);
-
-    printf("device__pack ok\n");
-
-    xlen = len * 2 > MAXBUFLEN ? len*2 : MAXBUFLEN;
-    int outlen;
-    b64buf = malloc(xlen+1);
-    memset(b64buf, 0, xlen+1);
-    outlen = b64_encode_string(buf, len, b64buf, xlen);
-
-    printf("b64_encode_string ok\n");
-
-    libwebsock_send_text(state, b64buf);
-
-    free(buf);
-    free(b64buf);
-
-    printf("Exiting send_msg \n");
-    return 0;
-}
-
 int send_msg(libwebsock_client_state *state, 
              unsigned cid, 
              unsigned uid, 
@@ -331,10 +290,10 @@ void cnode_run()
                 // Is this userid connected?
                 if(clients[userid]){
                     fprintf(stderr, "Sending %d bytes to uid %d\n", body_len, userid);                
-                    evbuf = evbuffer_new();
-                    evbuffer_add(evbuf, (const void*)body, (size_t) body_len);
-                    evhttp_send_reply_chunk(clients[userid], evbuf);
-                    evbuffer_free(evbuf);
+                    // evbuf = evbuffer_new();
+                    // evbuffer_add(evbuf, (const void*)body, (size_t) body_len);
+                    // evhttp_send_reply_chunk(clients[userid], evbuf);
+                    // evbuffer_free(evbuf);
                 }else{
                     fprintf(stderr, "Discarding %d bytes to uid %d - user not connected\n", 
                             body_len, userid);                

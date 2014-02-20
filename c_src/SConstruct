@@ -34,11 +34,11 @@ import sys
 env = Environment()
 env.Append(CCFLAGS = '-g -Wall')
 
-inc = ['/usr/local/include/']
+inc = ['/usr/local/include/', '/usr/local/lib/erlang/usr/include/']
 lib_path = ['/usr/lib', '/usr/local/lib']
 # g++ -I /usr/local/boost_1_42_0 -lboost_system -lboost_thread a.cpp
 # g++ -I /usr/local/boost_1_42_0 -lboost_system-mt -lboost_thread-mt a.cpp
-libs = ['websock', 'protobuf-c']
+libs = ['websock', 'protobuf-c', 'erl_interface', 'ei']
 # lib_path = ['.'] # LIBPATH = ['/usr/lib', '/usr/local/lib']
 
 # common = Glob('../common/*.cpp')
