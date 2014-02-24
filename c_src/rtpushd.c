@@ -144,6 +144,16 @@ onmessage(libwebsock_client_state *state, libwebsock_message *msg)
     // printf("base64 decoded len: %d\n", xlen);
     // printMemBlock(buf, xlen);
 
+    if (msg->opcode == 1) {
+        if (strcmp(msg->payload, "ping") == 0) {
+            libwebsock_send_text(state, "pong");    
+        } else {
+            libwebsock_send_text(state, msg->payload);    
+        }
+        
+        return 0;
+    }
+
     Device *dev = NULL;
     dev = device__unpack(NULL, msg->payload_len, msg->payload);
     if (NULL == dev) {
@@ -315,12 +325,6 @@ int
 main(int argc, char *argv[])
 {
 
-    // Launch the thread that runs the cnode:
-    pthread_attr_t tattr;
-    pthread_t helper;
-    int status;
-    pthread_create(&helper, NULL, cnode_run, NULL);
-
     char *port = DEF_PORT;
     libwebsock_context *ctx = NULL;
 
@@ -333,6 +337,12 @@ main(int argc, char *argv[])
     {
         port = argv[1];
     }
+
+    // Launch the thread that runs the cnode:
+    // pthread_attr_t tattr;
+    // pthread_t helper;
+    // int status;
+    // pthread_create(&helper, NULL, cnode_run, NULL);
 
     ctx = libwebsock_init();
     if (ctx == NULL)

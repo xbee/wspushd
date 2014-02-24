@@ -30,7 +30,7 @@ int onmessage(wsclient *c, wsclient_message *msg) {
 int onopen(wsclient *c) {
 	fprintf(stderr, "onopen called: %d\n", c->sockfd);
 
-	void *buf, *b64buf;
+	void *buf;
 	unsigned len;
 	Device dev = DEVICE__INIT;
 	dev.cid = 1; // 1 means : com.wanda.app.wanhui
@@ -40,13 +40,8 @@ int onopen(wsclient *c) {
 	buf = malloc(len);
 	device__pack(&dev, buf);
 
-	// int xlen = len * 2 > MAXBUFLEN ? len*2 : MAXBUFLEN;
-	// int outlen;
-	// b64buf = malloc(xlen+1);
-	// memset(b64buf, 0, xlen+1);
-	// outlen = b64_encode_string(buf, len, b64buf, xlen);
-	// libwsclient_send(c, b64buf);
 	libwsclient_send_binary(c, buf, len);
+	free(buf);
 	return 0;
 }
 
