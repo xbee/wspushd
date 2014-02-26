@@ -59,8 +59,7 @@ close(WS, WsReason) ->
 
 start_conn(State) ->
     {ok, Socket} = gen_tcp:connect(State#state.host, State#state.port,
-                                   [binary,
-                                    {packet, 0}]),
+                                   [binary,{reuseaddr,true},{packet, 0}]),
     Key = base64:encode_to_string(crypto:rand_bytes(16)),
     gen_tcp:send(Socket,
         "GET " ++ State#state.path ++ " HTTP/1.1\r\n" ++

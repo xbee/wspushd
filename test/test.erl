@@ -1,5 +1,6 @@
 #!/usr/bin/env escript
-%%! -input
+%%! +P 999999
+
 -module(test).
 -mode(compile).
 
@@ -38,13 +39,13 @@ loop(WS, ID) ->
     end.
 
 main([WsUrl]) ->
-    start_test(WsUrl, 5000),
-    timer:sleep(2000),
-    start_test(WsUrl, 2000),
-    timer:sleep(2000),
-    start_test(WsUrl, 2000),
-    timer:sleep(2000),
-    start_test(WsUrl, 2000),
+    start_test(WsUrl, 100000),
+    % timer:sleep(2000),
+    % start_test(WsUrl, 2000),
+    % timer:sleep(2000),
+    % start_test(WsUrl, 2000),
+    % timer:sleep(2000),
+    % start_test(WsUrl, 2000),
     start([WsUrl, 1]).
     % spawn(?MODULE, wstest, [[WsUrl]]).
 
@@ -56,9 +57,9 @@ start_test(Url, N) ->
     io:format(" Start to test~n"),
     F = fun(K) -> 
           % io:format(" spawn wstest~n"),
-          spawn(fun() -> start([Url, K]) end)
+          spawn(fun() -> start([Url, K]) end),
+          timer:sleep(1)
           % spawn(testclient, start, [[Url]])
         end,
-    io:format(" Start to test2~n"),
     lists:map(F, lists:seq(2,N)).  % F must have one argument
 
