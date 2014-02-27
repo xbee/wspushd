@@ -1,0 +1,16 @@
+// enum CmdType {
+//    GETUID = 0;
+//    GETUID_RESPONSE = 1;
+//    LOGIN = 2;
+//    LOGOUT = 3;
+//    NEAR = 4;
+//    AD = 6;
+//  }
+
+message Device {
+  required uint32 cid = 1;
+  required uint32 uid = 2;  
+  required uint32 cmdid = 3;  
+  required string msg = 4;
+}
+

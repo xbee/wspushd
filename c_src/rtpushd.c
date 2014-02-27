@@ -148,8 +148,16 @@ onmessage(libwebsock_client_state *state, libwebsock_message *msg)
         if (strcmp(msg->payload, "ping") == 0) {
             libwebsock_send_text(state, "pong");    
         } else {
+            printf("Payload Length: %llu\n", msg->payload_len);
             libwebsock_send_text(state, msg->payload);    
         }
+        
+        return 0;
+    }
+
+    if (strcmp(state->uri, "/ss") == 0) {
+        printf("Received ss, Payload Length: %llu\n", msg->payload_len);
+        libwebsock_send_text(state, "received ss");     
         
         return 0;
     }
