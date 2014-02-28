@@ -1,13 +1,18 @@
 package main
 
+// protoc --go_out=$GOPATH/src/bitants.com/protobuf/ device.proto
+
 import (
+	// "bitants.com/protobuf/wspushd"
+	"./wspushd"
 	"code.google.com/p/go.net/websocket"
 	// "code.google.com/p/snappy-go/snappy"
 	"bytes"
+	"code.google.com/p/goprotobuf/proto"
 	"fmt"
 	opencv "github.com/lazywei/go-opencv/opencv"
 	"github.com/vova616/screenshot"
-	"image/png"
+	"image/jpeg"
 	"log"
 	"os"
 	"os/signal"
@@ -36,19 +41,32 @@ func ss(t time.Time, ws *websocket.Conn) {
 		panic(err)
 	}
 
-	// fn := fmt.Sprintf("%d-%d-%d_%d:%d:%d.png", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+	fn := fmt.Sprintf("%d-%d-%d_%d:%d:%d.png", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	// f, err := os.Create(fn)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	var b bytes.Buffer
-	err = png.Encode(&b, img)
+	err = jpeg.Encode(&b, img, &jpeg.Options{30})
+	// err = png.Encode(&b, img)
 	if err != nil {
 		panic(err)
 	}
+
+	dev := &wspushd.Device{
+		Cmdid: proto.Uint32(1),
+		Uid:   proto.String("f8:b1:56:a4:47:ec"),
+		Msg: &wspushd.Data{
+			Name: proto.String(fn),
+			Data: b.Bytes(),
+		},
+	}
+
+	buf, err := proto.Marshal(dev)
+
 	// send it to server
 
-	if err = websocket.Message.Send(ws, b.Bytes()); err != nil {
+	if err = websocket.Message.Send(ws, buf); err != nil {
 		panic(err)
 	}
 	// f.Close()

@@ -1,0 +1,7 @@
+data/go.py.i
+data/README.i
+data/README.rst.i
+data/build-helper.sh.i
+data/helper.go.i
+data/.bzrignore.i
+data/__init__.py.i

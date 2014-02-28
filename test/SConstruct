@@ -31,8 +31,8 @@
 
 import sys
 
-env = Environment()
-env.Append(CCFLAGS = '-g -Wall')
+# SConstruct
+env = Environment(TOOLS=['default', 'go'])
 
 inc = ['/usr/local/include/', '/usr/local/lib/erlang/usr/include/']
 lib_path = ['/usr/lib', '/usr/local/lib']
@@ -43,20 +43,20 @@ libs = ['websock', 'protobuf-c', 'erl_interface', 'ei']
 
 # common = Glob('../common/*.cpp')
 # srclist = ['LocNetPacketParser.cpp', 'rtmap_nif.cpp', 'niftools.cpp']
-srclist = ['rtpushd.c', 'device.pb-c.c', 'printhex.c']
+srclist = ['screenticks.go']
 
 # env = Environment(TARGET_ARCH='x86_64')
 
 # exec external command to compile device.proto to c 
 # device.pb-c.c depends on device.proto 
-env.Command('device.pb.go', 'device.proto', 'protoc --go_out=. device.proto')
-env.Append(CPPPATH=inc)
-env.Program(target='bin/rtpushd', 
-	source=srclist, 
-	LIBS=libs, LIBPATH=lib_path)
-env.Program(target='bin/test', 
-	source=['test.c', 'device.pb-c.c', 'printhex.c'], 
-	LIBS=['wsclient', 'protobuf-c'], 
-	LIBPATH=lib_path)
+# env.Command('device.pb.go', 'device.proto', 'protoc --go_out=. device.proto')
+# A simple program
+env.GoProgram('screenticks', srclist)
+
+# A multi-package program
+# bar = env.Go('bar', srclist)
+# env.Go('baz', ['src/baz1.go', 'src/baz2.go'])
+# env.GoProgram('bar', bar)
+
 # Decider('MD5-timestamp')
 env.Decider('MD5')

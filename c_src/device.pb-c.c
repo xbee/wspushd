@@ -7,58 +7,101 @@
 #endif
 
 #include "device.pb-c.h"
-void   device__init
-                     (Device         *message)
+void   wspushd__device__init
+                     (Wspushd__Device         *message)
 {
-  static Device init_value = DEVICE__INIT;
+  static Wspushd__Device init_value = WSPUSHD__DEVICE__INIT;
   *message = init_value;
 }
-size_t device__get_packed_size
-                     (const Device *message)
+size_t wspushd__device__get_packed_size
+                     (const Wspushd__Device *message)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &device__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__device__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t device__pack
-                     (const Device *message,
+size_t wspushd__device__pack
+                     (const Wspushd__Device *message,
                       uint8_t       *out)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &device__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__device__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t device__pack_to_buffer
-                     (const Device *message,
+size_t wspushd__device__pack_to_buffer
+                     (const Wspushd__Device *message,
                       ProtobufCBuffer *buffer)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &device__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__device__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Device *
-       device__unpack
+Wspushd__Device *
+       wspushd__device__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Device *)
-     protobuf_c_message_unpack (&device__descriptor,
+  return (Wspushd__Device *)
+     protobuf_c_message_unpack (&wspushd__device__descriptor,
                                 allocator, len, data);
 }
-void   device__free_unpacked
-                     (Device *message,
+void   wspushd__device__free_unpacked
+                     (Wspushd__Device *message,
                       ProtobufCAllocator *allocator)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &device__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__device__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor device__field_descriptors[4] =
+void   wspushd__data__init
+                     (Wspushd__Data         *message)
+{
+  static Wspushd__Data init_value = WSPUSHD__DATA__INIT;
+  *message = init_value;
+}
+size_t wspushd__data__get_packed_size
+                     (const Wspushd__Data *message)
+{
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__data__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t wspushd__data__pack
+                     (const Wspushd__Data *message,
+                      uint8_t       *out)
+{
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__data__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t wspushd__data__pack_to_buffer
+                     (const Wspushd__Data *message,
+                      ProtobufCBuffer *buffer)
+{
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__data__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Wspushd__Data *
+       wspushd__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Wspushd__Data *)
+     protobuf_c_message_unpack (&wspushd__data__descriptor,
+                                allocator, len, data);
+}
+void   wspushd__data__free_unpacked
+                     (Wspushd__Data *message,
+                      ProtobufCAllocator *allocator)
+{
+  PROTOBUF_C_ASSERT (message->base.descriptor == &wspushd__data__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+static const ProtobufCFieldDescriptor wspushd__device__field_descriptors[3] =
 {
   {
-    "cid",
+    "cmdid",
     1,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Device, cid),
+    PROTOBUF_C_OFFSETOF(Wspushd__Device, cmdid),
     NULL,
     NULL,
     0,            /* packed */
@@ -68,21 +111,9 @@ static const ProtobufCFieldDescriptor device__field_descriptors[4] =
     "uid",
     2,
     PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_UINT32,
+    PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Device, uid),
-    NULL,
-    NULL,
-    0,            /* packed */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "cmdid",
-    3,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_UINT32,
-    0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Device, cmdid),
+    PROTOBUF_C_OFFSETOF(Wspushd__Device, uid),
     NULL,
     NULL,
     0,            /* packed */
@@ -90,40 +121,90 @@ static const ProtobufCFieldDescriptor device__field_descriptors[4] =
   },
   {
     "msg",
-    4,
-    PROTOBUF_C_LABEL_REQUIRED,
+    3,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    PROTOBUF_C_OFFSETOF(Wspushd__Device, msg),
+    &wspushd__data__descriptor,
+    NULL,
+    0,            /* packed */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned wspushd__device__field_indices_by_name[] = {
+  0,   /* field[0] = cmdid */
+  2,   /* field[2] = msg */
+  1,   /* field[1] = uid */
+};
+static const ProtobufCIntRange wspushd__device__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 3 }
+};
+const ProtobufCMessageDescriptor wspushd__device__descriptor =
+{
+  PROTOBUF_C_MESSAGE_DESCRIPTOR_MAGIC,
+  "wspushd.Device",
+  "Device",
+  "Wspushd__Device",
+  "wspushd",
+  sizeof(Wspushd__Device),
+  3,
+  wspushd__device__field_descriptors,
+  wspushd__device__field_indices_by_name,
+  1,  wspushd__device__number_ranges,
+  (ProtobufCMessageInit) wspushd__device__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor wspushd__data__field_descriptors[2] =
+{
+  {
+    "name",
+    1,
+    PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Device, msg),
+    PROTOBUF_C_OFFSETOF(Wspushd__Data, name),
+    NULL,
+    NULL,
+    0,            /* packed */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "data",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BYTES,
+    PROTOBUF_C_OFFSETOF(Wspushd__Data, has_data),
+    PROTOBUF_C_OFFSETOF(Wspushd__Data, data),
     NULL,
     NULL,
     0,            /* packed */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned device__field_indices_by_name[] = {
-  0,   /* field[0] = cid */
-  2,   /* field[2] = cmdid */
-  3,   /* field[3] = msg */
-  1,   /* field[1] = uid */
+static const unsigned wspushd__data__field_indices_by_name[] = {
+  1,   /* field[1] = data */
+  0,   /* field[0] = name */
 };
-static const ProtobufCIntRange device__number_ranges[1 + 1] =
+static const ProtobufCIntRange wspushd__data__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 4 }
+  { 0, 2 }
 };
-const ProtobufCMessageDescriptor device__descriptor =
+const ProtobufCMessageDescriptor wspushd__data__descriptor =
 {
   PROTOBUF_C_MESSAGE_DESCRIPTOR_MAGIC,
-  "Device",
-  "Device",
-  "Device",
-  "",
-  sizeof(Device),
-  4,
-  device__field_descriptors,
-  device__field_indices_by_name,
-  1,  device__number_ranges,
-  (ProtobufCMessageInit) device__init,
+  "wspushd.Data",
+  "Data",
+  "Wspushd__Data",
+  "wspushd",
+  sizeof(Wspushd__Data),
+  2,
+  wspushd__data__field_descriptors,
+  wspushd__data__field_indices_by_name,
+  1,  wspushd__data__number_ranges,
+  (ProtobufCMessageInit) wspushd__data__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

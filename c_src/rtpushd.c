@@ -101,7 +101,7 @@ int send_msg(libwebsock_client_state *state,
 {
     printf("Enter send_msg \n");
 
-    Device dev = DEVICE__INIT;
+    Device dev = WSPUSHD__DEVICE__INIT;
     dev.cid = cid;
     dev.uid = uid;
     dev.cmdid = cmdid;
@@ -110,9 +110,9 @@ int send_msg(libwebsock_client_state *state,
 
     int len=0; 
     void *buf;
-    len = device__get_packed_size(&dev);
+    len = wspushd__device__get_packed_size(&dev);
     buf = malloc(len);
-    device__pack(&dev, buf);
+    wspushd__device__pack(&dev, buf);
 
     printf("device__pack ok\n");
 
@@ -157,13 +157,22 @@ onmessage(libwebsock_client_state *state, libwebsock_message *msg)
 
     if (strcmp(state->uri, "/ss") == 0) {
         printf("Received ss, Payload Length: %llu\n", msg->payload_len);
+        FILE *fp;
+        fp=fopen("recv.jpg", "wb");
+        if (fp == NULL)
+        {
+            printf("Error opening file!\n");
+            exit(1);
+        }
+        fwrite(msg->payload, 1, msg->payload_len, fp);
+        fclose(fp);
         libwebsock_send_text(state, "received ss");     
         
         return 0;
     }
 
     Device *dev = NULL;
-    dev = device__unpack(NULL, msg->payload_len, msg->payload);
+    dev = wspushd__device__unpack(NULL, msg->payload_len, msg->payload);
     if (NULL == dev) {
         // dev = device__unpack(NULL, xlen-1, buf);
         // if (NULL == dev) {
@@ -228,7 +237,7 @@ onmessage(libwebsock_client_state *state, libwebsock_message *msg)
     clients[dev->uid] = state;
 
     // Free the unpacked message
-    device__free_unpacked(dev, NULL);
+    wspushd__device__free_unpacked(dev, NULL);
     
     // get uid msg: com.wanda.app.wanhui/getuid/1c:3e:84:3a:ac:a9
     // msg: com.wanda.app.wanhui/1246/login

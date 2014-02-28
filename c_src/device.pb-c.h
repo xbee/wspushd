@@ -9,7 +9,8 @@
 PROTOBUF_C_BEGIN_DECLS
 
 
-typedef struct _Device Device;
+typedef struct _Wspushd__Device Wspushd__Device;
+typedef struct _Wspushd__Data Wspushd__Data;
 
 
 /* --- enums --- */
@@ -17,42 +18,75 @@ typedef struct _Device Device;
 
 /* --- messages --- */
 
-struct  _Device
+struct  _Wspushd__Device
 {
   ProtobufCMessage base;
-  uint32_t cid;
-  uint32_t uid;
   uint32_t cmdid;
-  char *msg;
+  char *uid;
+  Wspushd__Data *msg;
 };
-#define DEVICE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&device__descriptor) \
-    , 0, 0, 0, NULL }
+#define WSPUSHD__DEVICE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&wspushd__device__descriptor) \
+    , 0, NULL, NULL }
 
 
-/* Device methods */
-void   device__init
-                     (Device         *message);
-size_t device__get_packed_size
-                     (const Device   *message);
-size_t device__pack
-                     (const Device   *message,
+struct  _Wspushd__Data
+{
+  ProtobufCMessage base;
+  char *name;
+  protobuf_c_boolean has_data;
+  ProtobufCBinaryData data;
+};
+#define WSPUSHD__DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&wspushd__data__descriptor) \
+    , NULL, 0,{0,NULL} }
+
+
+/* Wspushd__Device methods */
+void   wspushd__device__init
+                     (Wspushd__Device         *message);
+size_t wspushd__device__get_packed_size
+                     (const Wspushd__Device   *message);
+size_t wspushd__device__pack
+                     (const Wspushd__Device   *message,
                       uint8_t             *out);
-size_t device__pack_to_buffer
-                     (const Device   *message,
+size_t wspushd__device__pack_to_buffer
+                     (const Wspushd__Device   *message,
                       ProtobufCBuffer     *buffer);
-Device *
-       device__unpack
+Wspushd__Device *
+       wspushd__device__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   device__free_unpacked
-                     (Device *message,
+void   wspushd__device__free_unpacked
+                     (Wspushd__Device *message,
+                      ProtobufCAllocator *allocator);
+/* Wspushd__Data methods */
+void   wspushd__data__init
+                     (Wspushd__Data         *message);
+size_t wspushd__data__get_packed_size
+                     (const Wspushd__Data   *message);
+size_t wspushd__data__pack
+                     (const Wspushd__Data   *message,
+                      uint8_t             *out);
+size_t wspushd__data__pack_to_buffer
+                     (const Wspushd__Data   *message,
+                      ProtobufCBuffer     *buffer);
+Wspushd__Data *
+       wspushd__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   wspushd__data__free_unpacked
+                     (Wspushd__Data *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*Device_Closure)
-                 (const Device *message,
+typedef void (*Wspushd__Device_Closure)
+                 (const Wspushd__Device *message,
+                  void *closure_data);
+typedef void (*Wspushd__Data_Closure)
+                 (const Wspushd__Data *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -60,7 +94,8 @@ typedef void (*Device_Closure)
 
 /* --- descriptors --- */
 
-extern const ProtobufCMessageDescriptor device__descriptor;
+extern const ProtobufCMessageDescriptor wspushd__device__descriptor;
+extern const ProtobufCMessageDescriptor wspushd__data__descriptor;
 
 PROTOBUF_C_END_DECLS
 
