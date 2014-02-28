@@ -8,7 +8,7 @@ import (
 
 func main() {
 	origin := "http://localhost/"
-	url := "ws://localhost:5555/ws"
+	url := "ws://localhost:5556/ss"
 	ws, err := websocket.Dial(url, "", origin)
 	if err != nil {
 		log.Fatal(err)

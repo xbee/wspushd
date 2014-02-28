@@ -41,13 +41,13 @@ func ss(t time.Time, ws *websocket.Conn) {
 		panic(err)
 	}
 
-	fn := fmt.Sprintf("%d-%d-%d_%d:%d:%d.png", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+	fn := fmt.Sprintf("%d-%d-%d_%d:%d:%d.jpg", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	// f, err := os.Create(fn)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	var b bytes.Buffer
-	err = jpeg.Encode(&b, img, &jpeg.Options{30})
+	err = jpeg.Encode(&b, img, &jpeg.Options{20})
 	// err = png.Encode(&b, img)
 	if err != nil {
 		panic(err)
@@ -81,7 +81,7 @@ func main() {
 	println("Please press CTRL-C to exit.")
 
 	origin := "http://localhost/"
-	url := "ws://localhost:5555/ss"
+	url := "ws://localhost:5556/ss"
 	ws, err := websocket.Dial(url, "", origin)
 	if err != nil {
 		log.Fatal(err)
