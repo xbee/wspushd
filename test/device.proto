@@ -1,4 +1,4 @@
-package wspushd;
+package msgproto;
 
 // enum CmdType {
 //    GETUID = 0;

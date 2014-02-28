@@ -163,7 +163,7 @@ function send() {
 func main() {
 	flag.Parse()
 	http.Handle("/ss", websocket.Handler(protoServer))
-	http.HandleFunc("/", MainServer)
+	// http.HandleFunc("/", MainServer)
 	fmt.Printf("http://localhost:%d/\n", *port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 	if err != nil {
