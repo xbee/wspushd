@@ -164,7 +164,7 @@ func main() {
 	flag.Parse()
 	http.Handle("/ss", websocket.Handler(protoServer))
 	// http.HandleFunc("/", MainServer)
-	fmt.Printf("http://localhost:%d/\n", *port)
+	fmt.Printf("http://0.0.0.0:%d/\n", *port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 	if err != nil {
 		panic("ListenANdServe: " + err.Error())
