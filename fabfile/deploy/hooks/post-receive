@@ -1,0 +1,3 @@
+#!/bin/sh
+GIT_WORK_TREE=/home/michael/prod git checkout -f
+
